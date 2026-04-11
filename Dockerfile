@@ -1,4 +1,5 @@
 ARG BASE_IMAGE=nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
+# MODEL_TYPE options: flux1-dev-fp8 | qwen-image
 
 # ---------------------------------------------------------------------------
 # Stage 1: Base — ComfyUI + handler runtime
@@ -97,7 +98,41 @@ RUN if [ "$MODEL_TYPE" = "flux1-dev-fp8" ]; then \
         https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev-fp8.safetensors; \
     fi
 
-# Add additional MODEL_TYPE blocks here as needed
+# qwen-image — Qwen-Image 2511 (edit) + 2512 (text-to-image) models
+# Sources: HuggingFace (Comfy-Org/Qwen-Image_ComfyUI + lightx2v/Qwen-Image-2512-Lightning)
+RUN if [ "$MODEL_TYPE" = "qwen-image" ]; then \
+      HF_BASE="https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files"; \
+      LIGHTNING_BASE="https://huggingface.co/lightx2v"; \
+      \
+      echo "Downloading Qwen shared models..."; \
+      wget -q -O models/vae/qwen_image_vae.safetensors \
+        "${HF_BASE}/vae/qwen_image_vae.safetensors"; \
+      wget -q -O models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \
+        "${HF_BASE}/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors"; \
+      \
+      echo "Downloading Qwen-Image 2512 (text-to-image) models..."; \
+      wget -q -O models/diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors \
+        "${HF_BASE}/diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors"; \
+      wget -q -O models/loras/Qwen-Image-2512-Lightning-4steps-V1.0-fp32.safetensors \
+        "${LIGHTNING_BASE}/Qwen-Image-2512-Lightning/resolve/main/Qwen-Image-2512-Lightning-4steps-V1.0-fp32.safetensors"; \
+      \
+      echo "Downloading Qwen-Image 2511 (image-edit) models..."; \
+      wget -q -O models/diffusion_models/qwen_image_edit_2511_bf16.safetensors \
+        "${HF_BASE}/diffusion_models/qwen_image_edit_2511_bf16.safetensors"; \
+      wget -q -O models/loras/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors \
+        "${LIGHTNING_BASE}/Qwen-Image-Edit-2511-Lightning/resolve/main/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors"; \
+    fi
+
+# Civitai LoRAs (shared by both Qwen workflows)
+# These 4 LoRAs are downloaded from Civitai using the API key.
+# Replace CIVITAI_VERSION_ID_* with the actual version IDs once known.
+# Download URL format: https://civitai.com/api/download/models/{versionId}?token={key}
+ARG CIVITAI_API_KEY
+RUN if [ "$MODEL_TYPE" = "qwen-image" ] && [ -n "$CIVITAI_API_KEY" ]; then \
+      CIVITAI_DL="https://civitai.com/api/download/models"; \
+      : "TODO: set correct version IDs after lookup"; \
+      echo "Civitai LoRA download requires version IDs — skipping until configured"; \
+    fi
 
 # ---------------------------------------------------------------------------
 # Stage 3: Final image
