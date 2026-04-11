@@ -55,10 +55,14 @@ RUN if [ "$ENABLE_PYTORCH_UPGRADE" = "true" ]; then \
 WORKDIR /comfyui
 ADD src/extra_model_paths.yaml ./
 
-# Install ComfyUI's Python dependencies into the active venv
-# (comfy-cli installs ComfyUI code but not its pip requirements)
-RUN uv pip install -r requirements.txt
-RUN uv pip install Pillow
+# Discover which Python comfy-cli used and install ComfyUI deps there.
+# comfy-cli may create its own venv (/comfyui/venv) rather than using /opt/venv.
+RUN COMFY_PYTHON=$(find /comfyui -name python -o -name python3 2>/dev/null | grep bin | head -1) && \
+    COMFY_PYTHON=${COMFY_PYTHON:-python} && \
+    echo "ComfyUI Python: $COMFY_PYTHON" && \
+    $COMFY_PYTHON -m pip install Pillow -q && \
+    $COMFY_PYTHON -c "from PIL import Image; print('Pillow OK')" && \
+    echo $COMFY_PYTHON > /comfy_python.txt
 
 WORKDIR /
 RUN uv pip install runpod requests websocket-client
