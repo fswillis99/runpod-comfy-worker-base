@@ -55,6 +55,10 @@ RUN if [ "$ENABLE_PYTORCH_UPGRADE" = "true" ]; then \
 WORKDIR /comfyui
 ADD src/extra_model_paths.yaml ./
 
+# Install ComfyUI's Python dependencies into the active venv
+# (comfy-cli installs ComfyUI code but not its pip requirements)
+RUN uv pip install -r requirements.txt
+
 WORKDIR /
 RUN uv pip install runpod requests websocket-client
 
