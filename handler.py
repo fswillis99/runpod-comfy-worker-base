@@ -251,6 +251,12 @@ def check_server(url, retries=0, delay=50):
         # --- Check if ComfyUI process is still alive ---
         process_status = _is_comfyui_process_alive()
         if process_status is False:
+            try:
+                with open("/tmp/comfyui.log", "r") as f:
+                    log_tail = f.read()[-4000:]
+                print(f"worker-comfyui - ComfyUI startup log:\n{log_tail}")
+            except Exception:
+                print("worker-comfyui - Could not read /tmp/comfyui.log")
             print(
                 "worker-comfyui - ComfyUI process has exited. "
                 "Server will not become reachable."
