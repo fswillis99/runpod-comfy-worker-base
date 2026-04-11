@@ -51,17 +51,20 @@ echo "worker-comfyui: Starting ComfyUI"
 # PID file used by the handler to detect if ComfyUI is still running
 COMFY_PID_FILE="/tmp/comfyui.pid"
 
+# Use the Python that was verified at build time (may be comfy-cli's own venv)
+COMFY_PYTHON=$(cat /comfy_python.txt 2>/dev/null || echo "python")
+
 # Serve the API and don't shutdown the container
 COMFY_LOG="/tmp/comfyui.log"
 
 if [ "$SERVE_API_LOCALLY" == "true" ]; then
-    python -u /comfyui/main.py --disable-auto-launch --disable-metadata --listen --verbose "${COMFY_LOG_LEVEL}" --log-stdout >"$COMFY_LOG" 2>&1 &
+    $COMFY_PYTHON -u /comfyui/main.py --disable-auto-launch --disable-metadata --listen --verbose "${COMFY_LOG_LEVEL}" --log-stdout >"$COMFY_LOG" 2>&1 &
     echo $! > "$COMFY_PID_FILE"
 
     echo "worker-comfyui: Starting RunPod Handler"
     python -u /handler.py --rp_serve_api --rp_api_host=0.0.0.0
 else
-    python -u /comfyui/main.py --disable-auto-launch --disable-metadata --verbose "${COMFY_LOG_LEVEL}" --log-stdout >"$COMFY_LOG" 2>&1 &
+    $COMFY_PYTHON -u /comfyui/main.py --disable-auto-launch --disable-metadata --verbose "${COMFY_LOG_LEVEL}" --log-stdout >"$COMFY_LOG" 2>&1 &
     echo $! > "$COMFY_PID_FILE"
 
     echo "worker-comfyui: Starting RunPod Handler"
