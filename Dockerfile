@@ -138,7 +138,7 @@ RUN CUSTOM_BASE="https://comfy-kappa-files-001.s3.us-east-1.amazonaws.com/models
     wget -q -O models/loras/spanking_Qwen-dim64-v1.safetensors \
       "${CUSTOM_BASE}/spanking_Qwen-dim64-v1.safetensors"; \
     wget -q -O models/loras/Korean_qwen.safetensors \
-      "${CUSTOM_BASE}/Korean_qwen.safetensors"; \
+      "${CUSTOM_BASE}/Korean_qwen.safetensors"
 
 # ---------------------------------------------------------------------------
 # Stage 3: Final image
