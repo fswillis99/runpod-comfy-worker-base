@@ -17,16 +17,11 @@ steps:
       - Dockerfile.dockerhub
       - '-t'
       - '${_IMAGE_NAME}:latest'
-      - '-t'
-      - '${_IMAGE_NAME}:$COMMIT_SHA'
       - '.'
 
   # Push
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', '${_IMAGE_NAME}:latest']
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '${_IMAGE_NAME}:$COMMIT_SHA']
 
 substitutions:
   _IMAGE_NAME: fswillis99/runpod-comfy-worker
