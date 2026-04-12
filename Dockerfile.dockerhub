@@ -99,7 +99,7 @@ RUN wget -q -O models/checkpoints/flux1-dev-fp8.safetensors \
 # qwen-image — Qwen-Image 2511 (edit) + 2512 (text-to-image) models
 # Sources: HuggingFace (Comfy-Org/Qwen-Image_ComfyUI + lightx2v/Qwen-Image-2512-Lightning)
 RUN HF_BASE="https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files"; \
-    HF_BASE_2="https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files"
+    HF_BASE_2="https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files"; \
     LIGHTNING_BASE="https://huggingface.co/lightx2v"; \
     \
     echo "Downloading Qwen shared models..."; \
