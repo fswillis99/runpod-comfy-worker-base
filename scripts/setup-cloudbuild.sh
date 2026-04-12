@@ -29,7 +29,7 @@ fi
 PROJECT_ID="project-b882ddad-b8b1-4a5c-908"
 PROJECT_NUMBER="85726111298"
 SA="cloud-build@${PROJECT_ID}.iam.gserviceaccount.com"
-CB_SA="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
+CB_SA="service-${PROJECT_NUMBER}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
 DOCKERHUB_USERNAME="fswillis99"
 DOCKERHUB_TOKEN="dckr_pat_ZjpcY6x4viPh2FgN_Vw_dLLAe2k"
 
