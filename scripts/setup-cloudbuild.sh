@@ -8,6 +8,24 @@
 
 set -euo pipefail
 
+# Find gcloud in common install locations
+for dir in \
+    "$HOME/google-cloud-sdk/bin" \
+    "/usr/local/google-cloud-sdk/bin" \
+    "/opt/google-cloud-sdk/bin" \
+    "/tmp/google-cloud-sdk/bin" \
+    "/usr/lib/google-cloud-sdk/bin"; do
+  if [ -x "$dir/gcloud" ]; then
+    export PATH="$dir:$PATH"
+    break
+  fi
+done
+
+if ! command -v gcloud &>/dev/null; then
+  echo "gcloud not found. Install it: https://cloud.google.com/sdk/docs/install"
+  exit 1
+fi
+
 PROJECT_ID="project-b882ddad-b8b1-4a5c-908"
 PROJECT_NUMBER="85726111298"
 SA="cloud-build@${PROJECT_ID}.iam.gserviceaccount.com"
