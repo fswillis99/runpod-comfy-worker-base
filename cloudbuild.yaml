@@ -21,11 +21,11 @@ steps:
     args:
       - '-c'
       - |
-        TAG=$(cat /workspace/tag.txt)
+        TAG=$$(cat /workspace/tag.txt)
         docker build \
           -f Dockerfile.dockerhub \
           -t fswillis99/runpod-comfy-worker:latest \
-          -t fswillis99/runpod-comfy-worker:${TAG} \
+          -t fswillis99/runpod-comfy-worker:$${TAG} \
           .
 
   # Push both tags to Docker Hub
@@ -34,9 +34,9 @@ steps:
     args:
       - '-c'
       - |
-        TAG=$(cat /workspace/tag.txt)
+        TAG=$$(cat /workspace/tag.txt)
         docker push fswillis99/runpod-comfy-worker:latest
-        docker push fswillis99/runpod-comfy-worker:${TAG}
+        docker push fswillis99/runpod-comfy-worker:$${TAG}
 
 availableSecrets:
   secretManager:
