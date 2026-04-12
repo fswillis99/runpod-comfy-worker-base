@@ -51,6 +51,12 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${SA}" \
   --role="roles/storage.admin"
 
+# Allow the Cloud Build runner (Compute SA) to read uploaded source
+COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${COMPUTE_SA}" \
+  --role="roles/storage.objectViewer"
+
 
 echo "=== Done! Now you can submit builds as the service account: ==="
 echo ""
