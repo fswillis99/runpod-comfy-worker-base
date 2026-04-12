@@ -35,8 +35,10 @@ DOCKERHUB_TOKEN="dckr_pat_ZjpcY6x4viPh2FgN_Vw_dLLAe2k"
 
 gcloud config set project "$PROJECT_ID"
 
-echo "=== Enabling APIs ==="
+echo "=== Enabling Cloud Build API (creates the CB service account) ==="
 gcloud services enable cloudbuild.googleapis.com
+echo "Waiting for Cloud Build SA to be provisioned..."
+sleep 15
 
 echo "=== Granting cloud-build SA the roles it needs ==="
 # Submit builds
@@ -49,7 +51,7 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${SA}" \
   --role="roles/storage.admin"
 
-# Run builds as the Cloud Build service account
+# Run builds as the Cloud Build service account (now exists after API enable)
 gcloud iam service-accounts add-iam-policy-binding "$CB_SA" \
   --project="$PROJECT_ID" \
   --member="serviceAccount:${SA}" \
