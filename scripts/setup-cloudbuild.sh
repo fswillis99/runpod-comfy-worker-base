@@ -35,8 +35,8 @@ DOCKERHUB_TOKEN="dckr_pat_ZjpcY6x4viPh2FgN_Vw_dLLAe2k"
 
 gcloud config set project "$PROJECT_ID"
 
-echo "=== Enabling Cloud Build API (creates the CB service account) ==="
-gcloud services enable cloudbuild.googleapis.com
+echo "=== Enabling APIs ==="
+gcloud services enable cloudbuild.googleapis.com secretmanager.googleapis.com
 echo "Waiting for Cloud Build SA to be provisioned..."
 sleep 15
 
@@ -62,6 +62,30 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${SA}" \
   --role="roles/iam.serviceAccountUser"
 
+
+echo "=== Creating Docker Hub credentials in Secret Manager ==="
+# The Cloud Build runner SA needs to read these secrets
+CB_RUNNER="service-${PROJECT_NUMBER}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+
+for SECRET_NAME in dockerhub-username dockerhub-token; do
+  if gcloud secrets describe "$SECRET_NAME" --project="$PROJECT_ID" &>/dev/null; then
+    echo "Secret $SECRET_NAME already exists, skipping create."
+  else
+    case "$SECRET_NAME" in
+      dockerhub-username) VALUE="$DOCKERHUB_USERNAME" ;;
+      dockerhub-token)    VALUE="$DOCKERHUB_TOKEN" ;;
+    esac
+    echo -n "$VALUE" | gcloud secrets create "$SECRET_NAME" \
+      --project="$PROJECT_ID" \
+      --replication-policy=automatic \
+      --data-file=-
+  fi
+
+  gcloud secrets add-iam-policy-binding "$SECRET_NAME" \
+    --project="$PROJECT_ID" \
+    --member="serviceAccount:${CB_RUNNER}" \
+    --role="roles/secretmanager.secretAccessor"
+done
 
 echo "=== Done! Now you can submit builds as the service account: ==="
 echo ""
