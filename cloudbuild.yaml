@@ -9,19 +9,34 @@ steps:
       - DOCKERHUB_USERNAME
       - DOCKERHUB_TOKEN
 
-  # Build the image
-  - name: 'gcr.io/cloud-builders/docker'
+  # Generate datetime tag (YYYYMMDD-HHMM) and write to /workspace/tag.txt
+  - name: 'bash'
     args:
-      - build
-      - '-f'
-      - Dockerfile.dockerhub
-      - '-t'
-      - 'fswillis99/runpod-comfy-worker:latest'
-      - '.'
+      - '-c'
+      - date -u +%Y%m%d-%H%M | tee /workspace/tag.txt
 
-  # Push to Docker Hub
+  # Build the image with both :latest and :YYYYMMDD-HHMM tags
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'fswillis99/runpod-comfy-worker:latest']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        TAG=$(cat /workspace/tag.txt)
+        docker build \
+          -f Dockerfile.dockerhub \
+          -t fswillis99/runpod-comfy-worker:latest \
+          -t fswillis99/runpod-comfy-worker:${TAG} \
+          .
+
+  # Push both tags to Docker Hub
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        TAG=$(cat /workspace/tag.txt)
+        docker push fswillis99/runpod-comfy-worker:latest
+        docker push fswillis99/runpod-comfy-worker:${TAG}
 
 availableSecrets:
   secretManager:
