@@ -57,6 +57,11 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${COMPUTE_SA}" \
   --role="roles/storage.objectViewer"
 
+# Allow cloud-build SA to act as any SA the build runs under
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${SA}" \
+  --role="roles/iam.serviceAccountUser"
+
 
 echo "=== Done! Now you can submit builds as the service account: ==="
 echo ""
