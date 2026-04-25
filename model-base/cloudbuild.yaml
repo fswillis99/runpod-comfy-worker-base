@@ -31,15 +31,15 @@ steps:
           -t us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base:$${TAG} \
           .
 
-  # Push both tags to Docker Hub
+  # Push both tags to Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args:
       - "-c"
       - |
         TAG=$$(cat /workspace/tag.txt)
-        docker push fswillis99/runpod-model-base:latest
-        docker push fswillis99/runpod-model-base:$${TAG}
+        docker push us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base:latest
+        docker push us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base:$${TAG}
 
 availableSecrets:
   secretManager:
