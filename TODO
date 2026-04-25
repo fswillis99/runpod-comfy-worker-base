@@ -1,0 +1,65 @@
+
+See: https://claude.ai/share/f6184279-bff5-491a-a659-c0d3aef14fe8
+
+Image 1: models-base (built rarely)
+dockerfileFROM nvidia/cuda:12.x-runtime-ubuntu22.04
+
+COPY --link models/model_a/ /app/models/model_a/
+COPY --link models/model_b/ /app/models/model_b/
+COPY --link models/model_c/ /app/models/model_c/
+
+
+Image 2: comfyui-app (built frequently)
+dockerfileFROM models-base AS models
+
+FROM nvidia/cuda:12.x-runtime-ubuntu22.04
+
+# System + Python deps
+RUN apt-get update && apt-get install -y ...
+COPY requirements.txt /app/
+RUN pip install -r /app/requirements.txt
+
+# ComfyUI
+COPY comfyui/ /app/comfyui/
+
+# Pull models from the stable image — layers keep their hash
+COPY --from=models /app/models/ /app/models/
+
+COPY scripts/ /app/scripts/
+ENTRYPOINT ["/app/scripts/start.sh"]
+
+
+
+The critical detail for hash preservation: COPY --from with --link is what you
+want here. Without --link, the layer hash depends on the layers below it (the
+parent chain), so any change to your apt-get or pip layers would produce a new
+hash for the model layers even though the content is identical. With --link:
+
+dockerfile
+COPY --link --from=models /app/models/model_a/ /app/models/model_a/
+COPY --link --from=models /app/models/model_b/ /app/models/model_b/
+COPY --link --from=models /app/models/model_c/ /app/models/model_c/
+
+
+Each model layer's digest is purely a function of its content. Change your pip
+requirements, rebuild, push — the registry already has those model blobs, push
+skips them entirely.
+
+One thing to watch out for: make sure you're referencing models-base by digest
+in production builds, not just a mutable tag:
+
+dockerfile
+FROM us-central1-docker.pkg.dev/your-project/repo/models-base@sha256:abc123... AS models
+
+If you reference by tag and someone rebuilds models-base with identical content
+but a different BuildKit version or timestamp metadata, you could end up with
+different layer hashes unexpectedly. Pinning by digest guarantees reproducibility.
+
+Workflow then becomes:
+
+Models change → rebuild and push models-base (slow, but rare), update the digest reference
+App code changes → rebuild comfyui-app (fast, only small layers are new), push is quick
+since model layers already exist in the registry
+
+This should make your crane pushes much more pleasant — you'll only be pushing the small
+delta layers on routine builds instead of re-uploading those big blobs every time.
