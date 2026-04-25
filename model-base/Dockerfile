@@ -16,6 +16,10 @@ FROM ${BASE_IMAGE} AS base
 # ---------------------------------------------------------------------------
 FROM base AS final
 
+RUN apt-get update && apt-get install -y \
+    wget \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir /comfyui
 WORKDIR /comfyui
 RUN mkdir -p models/checkpoints models/vae models/unet models/clip \
