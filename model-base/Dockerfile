@@ -16,6 +16,13 @@ FROM ${BASE_IMAGE} AS base
 # ---------------------------------------------------------------------------
 FROM base AS final
 
+# Re-declare ARGs so they are available in this stage (Docker scopes pre-FROM
+# ARGs to the preamble only; re-declaring without a value inherits the default)
+ARG HF_BASE
+ARG HF_BASE_2
+ARG LIGHTNING_BASE
+ARG CUSTOM_BASE
+
 RUN apt-get update && apt-get install -y \
     wget \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
