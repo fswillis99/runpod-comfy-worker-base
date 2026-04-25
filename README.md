@@ -25,9 +25,15 @@ src/
   extra_model_paths.yaml
 scripts/
   setup-cloudbuild.sh   # One-time GCP setup (run as project owner)
+model-base/
+  Dockerfile            # Standalone image containing only baked-in models (no ComfyUI runtime)
+  cloudbuild.yaml       # Cloud Build config for model-base — pushes to Artifact Registry
+  models.txt            # Inventory of baked-in model files with verified sizes
 ```
 
 ## Building
+
+### Worker image (RunPod)
 
 Builds are handled by Google Cloud Build. After running the one-time setup:
 
@@ -43,6 +49,21 @@ gcloud builds submit \
 ```
 
 The build uses a 300 GB disk and pushes the final image to Docker Hub as `fswillis99/runpod-comfy-worker:latest`.
+
+### Model-base image
+
+The model-base image contains only the baked-in model files. It is built separately and infrequently — only when models are added or updated. The build caches from the previous model-base image in Artifact Registry so unchanged model layers are not re-downloaded or re-pushed.
+
+```bash
+gcloud builds submit \
+  --project=project-b882ddad-b8b1-4a5c-908 \
+  --config=model-base/cloudbuild.yaml \
+  model-base/
+```
+
+The build uses a 500 GB disk and pushes to Artifact Registry as:
+- `us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base:latest`
+- `us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base:YYYYMMDD-HHMM`
 
 ## RunPod Deployment
 
