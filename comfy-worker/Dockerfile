@@ -2,14 +2,13 @@
 # ---------------------------------------------------------------------------
 # Models - pulled from the stable model-base image (rebuilt rarely).
 # Update this digest when model-base changes.
+# Includes: nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
 # ---------------------------------------------------------------------------
-FROM us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base@sha256:c2e6bfa868a6629e2ffb5cd924ab6f5b41eb4aaee0ef7f73b8e0317d76bde4e8 AS models
+FROM us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base@sha256:c2e6bfa868a6629e2ffb5cd924ab6f5b41eb4aaee0ef7f73b8e0317d76bde4e8
 
 # ---------------------------------------------------------------------------
 # Base - ComfyUI + handler runtime (rebuilt on every app change)
 # ---------------------------------------------------------------------------
-FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04 AS base
-
 ARG COMFYUI_VERSION=latest
 ARG CUDA_VERSION_FOR_COMFY
 ARG ENABLE_PYTORCH_UPGRADE=false
@@ -80,23 +79,6 @@ COPY scripts/comfy-manager-set-mode.sh /usr/local/bin/comfy-manager-set-mode
 RUN chmod +x /usr/local/bin/comfy-node-install /usr/local/bin/comfy-manager-set-mode
 
 ENV PIP_NO_INPUT=1
+# COPY comfy-worker/Dockerfile /Dockerfile
 
 CMD ["/start.sh"]
-
-# ---------------------------------------------------------------------------
-# Final - base + model layers from model-base.
-# --link preserves layer hashes so the registry skips blobs it already has.
-# ---------------------------------------------------------------------------
-FROM base AS final
-
-COPY --link --from=models /comfyui/models/checkpoints/flux1-dev-fp8.safetensors                              /comfyui/models/checkpoints/
-COPY --link --from=models /comfyui/models/diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors          /comfyui/models/diffusion_models/
-COPY --link --from=models /comfyui/models/diffusion_models/qwen_image_edit_2511_bf16.safetensors           /comfyui/models/diffusion_models/
-COPY --link --from=models /comfyui/models/loras/Korean_qwen.safetensors                                    /comfyui/models/loras/
-COPY --link --from=models /comfyui/models/loras/Qwen-Image-2512-Lightning-4steps-V1.0-fp32.safetensors     /comfyui/models/loras/
-COPY --link --from=models /comfyui/models/loras/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors /comfyui/models/loras/
-COPY --link --from=models /comfyui/models/loras/Qwen4Play-2512.1_e10.safetensors                           /comfyui/models/loras/
-COPY --link --from=models /comfyui/models/loras/qwen-image_nsfw_adv_v1.0.safetensors                       /comfyui/models/loras/
-COPY --link --from=models /comfyui/models/loras/spanking_Qwen-dim64-v1.safetensors                         /comfyui/models/loras/
-COPY --link --from=models /comfyui/models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors             /comfyui/models/text_encoders/
-COPY --link --from=models /comfyui/models/vae/qwen_image_vae.safetensors                                   /comfyui/models/vae/
