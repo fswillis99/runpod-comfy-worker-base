@@ -13,11 +13,11 @@ Builds run on Google Cloud Build — there is no local build command for the ful
 ```bash
 gcloud builds submit \
   --project=project-b882ddad-b8b1-4a5c-908 \
-  --config=cloudbuild.yaml \
+  --config=comfy-worker/cloudbuild.yaml \
   .
 ```
 
-The build uses a 300 GB disk and pushes to `fswillis99/runpod-comfy-worker:latest` (and a datetime tag). Timeout is 6 hours.
+The build uses a 300 GB disk and pushes to `fswillis99/runpod-comfy-worker:latest` (and a datetime tag) and to Artifact Registry. Timeout is 6 hours.
 
 ## Local Testing
 
@@ -31,13 +31,14 @@ Set `SERVE_API_LOCALLY=true` to expose the RunPod handler REST API on `0.0.0.0` 
 
 ## Architecture
 
-### Two Dockerfiles
+### Two-image build
 
 - **`Dockerfile`** — one line: `FROM fswillis99/runpod-comfy-worker:latest`. This is what RunPod pulls; it just references the pre-built image.
-- **`Dockerfile.dockerhub`** — the actual multi-stage build used by Cloud Build:
+- **`model-base/`** — downloads all models (rebuilt rarely). Pushes to Artifact Registry. Update the digest in `comfy-worker/Dockerfile` when this changes.
+- **`comfy-worker/Dockerfile`** — the actual multi-stage build used by Cloud Build (config: `comfy-worker/cloudbuild.yaml`):
+  - **`models` stage**: references the pre-built `model-base` image by digest
   - **`base` stage**: installs ComfyUI via `comfy-cli` into `/comfyui`, installs handler runtime deps (`runpod`, `requests`, `websocket-client`), copies `handler.py`, `start.sh`, `network_volume.py`
-  - **`downloader` stage**: downloads all models from HuggingFace and a private S3 bucket into `/comfyui/models/`
-  - **`final` stage**: `base` + copies models from `downloader`
+  - **`final` stage**: `base` + `COPY --link --from=models /comfyui/models` (layer hashes preserved; registry skips blobs already present from model-base)
 
 ### Request/Response Flow
 
