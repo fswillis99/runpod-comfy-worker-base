@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # ---------------------------------------------------------------------------
 # Models - pulled from the stable model-base image (rebuilt rarely).
 # Update this digest when model-base changes.
