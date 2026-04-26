@@ -1,11 +1,11 @@
 # ---------------------------------------------------------------------------
-# Models — pulled from the stable model-base image (rebuilt rarely).
+# Models - pulled from the stable model-base image (rebuilt rarely).
 # Update this digest when model-base changes.
 # ---------------------------------------------------------------------------
 FROM us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base@sha256:c2e6bfa868a6629e2ffb5cd924ab6f5b41eb4aaee0ef7f73b8e0317d76bde4e8 AS models
 
 # ---------------------------------------------------------------------------
-# Base — ComfyUI + handler runtime (rebuilt on every app change)
+# Base - ComfyUI + handler runtime (rebuilt on every app change)
 # ---------------------------------------------------------------------------
 FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04 AS base
 
@@ -83,7 +83,7 @@ ENV PIP_NO_INPUT=1
 CMD ["/start.sh"]
 
 # ---------------------------------------------------------------------------
-# Final — base + model layers from model-base.
+# Final - base + model layers from model-base.
 # --link preserves layer hashes so the registry skips blobs it already has.
 # ---------------------------------------------------------------------------
 FROM base AS final
