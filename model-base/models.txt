@@ -1,0 +1,12 @@
+root@f640fb73720e:/comfyui# find models -type f -ls | grep -v "put_.*_here" | grep -v yaml
+ 3844994603 16842312 -rw-r--r--   1 root     root     17246524772 Apr 12 22:27 models/checkpoints/flux1-dev-fp8.safetensors
+13025664852 19951836 -rw-r--r--   1 root     root     20430679144 Apr 12 22:31 models/diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors
+13027497073 39903356 -rw-r--r--   1 root     root     40861031560 Apr 12 22:34 models/diffusion_models/qwen_image_edit_2511_bf16.safetensors
+ 2260305889   288232 -rw-r--r--   1 root     root       295146232 Apr  9 20:40 models/loras/Korean_qwen.safetensors
+ 2260305890  1659132 -rw-r--r--   1 root     root      1698951104 Apr 12 22:31 models/loras/Qwen-Image-2512-Lightning-4steps-V1.0-fp32.safetensors
+ 2260305891   829696 -rw-r--r--   1 root     root       849608296 Apr 12 22:34 models/loras/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors
+ 2260305893   576232 -rw-r--r--   1 root     root       590058432 Apr  9 20:40 models/loras/Qwen4Play-2512.1_e10.safetensors
+ 2260305895   860468 -rw-r--r--   1 root     root       881117472 Apr  9 20:40 models/loras/qwen-image_nsfw_adv_v1.0.safetensors
+ 2260305896   191852 -rw-r--r--   1 root     root       196454623 Apr  9 20:40 models/loras/spanking_Qwen-dim64-v1.safetensors
+12474919040  9164720 -rw-r--r--   1 root     root      9384670680 Apr 12 22:30 models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors
+ 9295795278   247860 -rw-r--r--   1 root     root       253806246 Apr 12 22:29 models/vae/qwen_image_vae.safetensors
