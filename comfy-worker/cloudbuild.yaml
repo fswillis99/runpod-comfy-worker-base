@@ -22,8 +22,10 @@ steps:
       - "-c"
       - |
         TAG=$$(cat /workspace/tag.txt)
+        docker pull us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:latest || true
         DOCKER_BUILDKIT=1 docker build \
           -f comfy-worker/Dockerfile \
+          --cache-from us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:latest \
           -t us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:latest \
           -t us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:$${TAG} \
           .
