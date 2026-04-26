@@ -15,7 +15,7 @@ steps:
       - '-c'
       - date -u +%Y%m%d-%H%M | tee /workspace/tag.txt
 
-  # Build the image with both :latest and :YYYYMMDD-HHMM tags
+  # Build the image. Model layers are pulled from model-base (no re-download).
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
@@ -26,9 +26,11 @@ steps:
           -f Dockerfile.dockerhub \
           -t fswillis99/runpod-comfy-worker:latest \
           -t fswillis99/runpod-comfy-worker:$${TAG} \
+          -t us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:latest \
+          -t us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:$${TAG} \
           .
 
-  # Push both tags to Docker Hub
+  # Push to Docker Hub (RunPod pulls from here via root Dockerfile)
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
@@ -37,6 +39,16 @@ steps:
         TAG=$$(cat /workspace/tag.txt)
         docker push fswillis99/runpod-comfy-worker:latest
         docker push fswillis99/runpod-comfy-worker:$${TAG}
+
+  # Push to Artifact Registry (model blob layers already present — push is fast)
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        TAG=$$(cat /workspace/tag.txt)
+        docker push us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:latest
+        docker push us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/comfy-worker:$${TAG}
 
 availableSecrets:
   secretManager:
