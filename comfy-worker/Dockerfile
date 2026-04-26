@@ -88,4 +88,14 @@ CMD ["/start.sh"]
 # ---------------------------------------------------------------------------
 FROM base AS final
 
-COPY --link --from=models /comfyui/models /comfyui/models
+COPY --link --from=models /comfyui/models/checkpoints/flux1-dev-fp8.safetensors                              /comfyui/models/checkpoints/
+COPY --link --from=models /comfyui/models/diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors          /comfyui/models/diffusion_models/
+COPY --link --from=models /comfyui/models/diffusion_models/qwen_image_edit_2511_bf16.safetensors           /comfyui/models/diffusion_models/
+COPY --link --from=models /comfyui/models/loras/Korean_qwen.safetensors                                    /comfyui/models/loras/
+COPY --link --from=models /comfyui/models/loras/Qwen-Image-2512-Lightning-4steps-V1.0-fp32.safetensors     /comfyui/models/loras/
+COPY --link --from=models /comfyui/models/loras/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors /comfyui/models/loras/
+COPY --link --from=models /comfyui/models/loras/Qwen4Play-2512.1_e10.safetensors                           /comfyui/models/loras/
+COPY --link --from=models /comfyui/models/loras/qwen-image_nsfw_adv_v1.0.safetensors                       /comfyui/models/loras/
+COPY --link --from=models /comfyui/models/loras/spanking_Qwen-dim64-v1.safetensors                         /comfyui/models/loras/
+COPY --link --from=models /comfyui/models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors             /comfyui/models/text_encoders/
+COPY --link --from=models /comfyui/models/vae/qwen_image_vae.safetensors                                   /comfyui/models/vae/
