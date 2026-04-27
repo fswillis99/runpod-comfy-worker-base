@@ -6,6 +6,8 @@ steps:
     args:
       - "-c"
       - |
+        apt-get update -qq && apt-get install -y -qq curl
+
         curl -sL https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz \
           | tar -xz -C /usr/local/bin crane
 
