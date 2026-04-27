@@ -46,11 +46,15 @@ ENV PATH="/opt/venv/bin:${PATH}"
 # Install ComfyUI via comfy-cli
 RUN uv pip install comfy-cli pip setuptools wheel
 
+RUN mv /comfyui /comfyui-base
 RUN if [ -n "${CUDA_VERSION_FOR_COMFY}" ]; then \
       /usr/bin/yes | comfy --workspace /comfyui install --version "${COMFYUI_VERSION}" --cuda-version "${CUDA_VERSION_FOR_COMFY}" --nvidia; \
     else \
       /usr/bin/yes | comfy --workspace /comfyui install --version "${COMFYUI_VERSION}" --nvidia; \
     fi
+
+RUN mv /comfyui/models /comfyui/models.install
+RUN mv /comfyui-base/models /comfyui/models
 
 RUN if [ "$ENABLE_PYTORCH_UPGRADE" = "true" ]; then \
       uv pip install --force-reinstall torch torchvision torchaudio --index-url ${PYTORCH_INDEX_URL}; \
