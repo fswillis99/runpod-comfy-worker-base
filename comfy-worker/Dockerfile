@@ -4,7 +4,7 @@
 # Update this digest when model-base changes.
 # Includes: nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
 # ---------------------------------------------------------------------------
-FROM us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base@sha256:c2e6bfa868a6629e2ffb5cd924ab6f5b41eb4aaee0ef7f73b8e0317d76bde4e8
+FROM us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base@sha256:409c80446822f352447914165dd98d684f6d74ee68f77c83b6ac5b18e8b1d3d3
 
 # ---------------------------------------------------------------------------
 # Base - ComfyUI + handler runtime (rebuilt on every app change)
