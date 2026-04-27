@@ -1,7 +1,7 @@
 steps:
   # Use crane to copy directly between registries — no layer download needed.
   # AR auth is handled automatically via the Cloud Build service account.
-  - name: "bash"
+  - name: "ubuntu"
     entrypoint: "bash"
     args:
       - "-c"
