@@ -27,8 +27,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /comfyui
-WORKDIR /comfyui
+RUN mkdir /models-cache
+WORKDIR /models-cache
 RUN mkdir -p models/checkpoints models/vae models/unet models/clip \
               models/text_encoders models/diffusion_models models/loras \
               models/controlnet models/upscale_models models/embeddings
@@ -77,3 +77,4 @@ RUN wget -q -O models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \
 RUN wget -q -O models/vae/qwen_image_vae.safetensors \
       "${HF_BASE}/vae/qwen_image_vae.safetensors"
 
+WORKDIR /
