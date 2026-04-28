@@ -17,7 +17,7 @@ gcloud builds submit \
   .
 ```
 
-The build uses a 300 GB disk and pushes to `fswillis99/runpod-comfy-worker:latest` (and a datetime tag) and to Artifact Registry. Timeout is 6 hours.
+The build uses a 500 GB disk and pushes to Artifact Registry. Timeout is 6 hours. To publish to Docker Hub, trigger `docker-publish/cloudbuild.yaml` separately.
 
 ## Local Testing
 
@@ -33,12 +33,9 @@ Set `SERVE_API_LOCALLY=true` to expose the RunPod handler REST API on `0.0.0.0` 
 
 ### Two-image build
 
-- **`Dockerfile`** — one line: `FROM fswillis99/runpod-comfy-worker:latest`. This is what RunPod pulls; it just references the pre-built image.
-- **`model-base/`** — downloads all models (rebuilt rarely). Pushes to Artifact Registry. Update the digest in `comfy-worker/Dockerfile` when this changes.
-- **`comfy-worker/Dockerfile`** — the actual multi-stage build used by Cloud Build (config: `comfy-worker/cloudbuild.yaml`):
-  - **`models` stage**: references the pre-built `model-base` image by digest
-  - **`base` stage**: installs ComfyUI via `comfy-cli` into `/comfyui`, installs handler runtime deps (`runpod`, `requests`, `websocket-client`), copies `handler.py`, `start.sh`, `network_volume.py`
-  - **`final` stage**: `base` + `COPY --link --from=models /comfyui/models` (layer hashes preserved; registry skips blobs already present from model-base)
+- **`model-base/`** — downloads all models into `/models-cache` (rebuilt rarely). Pushes to Artifact Registry. Update the digest in `comfy-worker/Dockerfile` when this changes.
+- **`comfy-worker/Dockerfile`** — single-stage build used by Cloud Build (config: `comfy-worker/cloudbuild.yaml`). Uses `model-base` as the `FROM` image (models already present at `/models-cache`), then installs ComfyUI via `comfy-cli` into `/comfyui`, installs handler runtime deps (`runpod`, `requests`, `websocket-client`), and copies `handler.py`, `start.sh`, `network_volume.py`. `extra_model_paths.yaml` points ComfyUI at `/models-cache`.
+- **`docker-publish/cloudbuild.yaml`** — separate pipeline that uses `crane copy` to transfer the built image from Artifact Registry to Docker Hub without re-downloading layers.
 
 ### Request/Response Flow
 
