@@ -15,10 +15,6 @@ Qwen workflows run in turbo mode (Lightning LoRA, 6 steps).
 ## Repository Structure
 
 ```
-Dockerfile              # Minimal — pulls pre-built image from Docker Hub (used by RunPod)
-Dockerfile.dockerhub    # Full multi-stage build with all model downloads (built by Cloud Build)
-cloudbuild.yaml         # Google Cloud Build — builds and pushes to Docker Hub
-cloudbuild.ar.yaml      # Google Cloud Build — builds and pushes to Artifact Registry (reference)
 handler.py              # RunPod job handler (WebSocket-based ComfyUI execution)
 src/
   start.sh              # Container entrypoint — starts ComfyUI then the handler
@@ -26,9 +22,14 @@ src/
 scripts/
   setup-cloudbuild.sh   # One-time GCP setup (run as project owner)
 model-base/
-  Dockerfile            # Standalone image containing only baked-in models (no ComfyUI runtime)
-  cloudbuild.yaml       # Cloud Build config for model-base — pushes to Artifact Registry
+  Dockerfile            # Downloads all models into /models-cache (rebuilt rarely)
+  cloudbuild.yaml       # Cloud Build config — pushes to Artifact Registry
   models.txt            # Inventory of baked-in model files with verified sizes
+comfy-worker/
+  Dockerfile            # FROM model-base; installs ComfyUI + handler runtime on top
+  cloudbuild.yaml       # Cloud Build config — pushes to Artifact Registry
+docker-publish/
+  cloudbuild.yaml       # Copies image from Artifact Registry to Docker Hub via crane
 ```
 
 ## Building
@@ -41,14 +42,27 @@ Builds are handled by Google Cloud Build. After running the one-time setup:
 # One-time setup (run as GCP project owner)
 bash scripts/setup-cloudbuild.sh
 
-# Submit a build
+# Build and push to Artifact Registry
 gcloud builds submit \
   --project=project-b882ddad-b8b1-4a5c-908 \
-  --config=cloudbuild.yaml \
+  --config=comfy-worker/cloudbuild.yaml \
   .
 ```
 
-The build uses a 300 GB disk and pushes the final image to Docker Hub as `fswillis99/runpod-comfy-worker:latest`.
+The build uses a 500 GB disk, pulls models from the pre-built `model-base` image (no re-download), and pushes to Artifact Registry as `runpod/comfy-worker:latest`.
+
+### Publishing to Docker Hub
+
+After the worker build completes, copy it to Docker Hub using `crane` (no layer re-download):
+
+```bash
+gcloud builds submit \
+  --project=project-b882ddad-b8b1-4a5c-908 \
+  --config=docker-publish/cloudbuild.yaml \
+  --no-source
+```
+
+This pushes `fswillis99/runpod-comfy-worker:latest`.
 
 ### Model-base image
 
