@@ -32,6 +32,18 @@ docker-publish/
   cloudbuild.yaml       # Copies image from Artifact Registry to Docker Hub via crane
 ```
 
+## Local Development
+
+### Artifact Registry credentials for crane
+
+`crane` uses the Docker credential helper chain. To authenticate against Artifact Registry, run once after activating a GCP service account:
+
+```bash
+gcloud auth configure-docker us-central1-docker.pkg.dev
+```
+
+This writes the credential helper entry to `~/.docker/config.json`. Subsequent `crane` commands against `us-central1-docker.pkg.dev` will use whatever `gcloud` account is active.
+
 ## Building
 
 ### Worker image (RunPod)
