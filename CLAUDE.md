@@ -50,7 +50,9 @@ Set `SERVE_API_LOCALLY=true` to expose the RunPod handler REST API on `0.0.0.0` 
 ```json
 {
   "input": {
-    "workflow": { /* ComfyUI API-format node graph */ },
+    "workflow": {
+      /* ComfyUI API-format node graph */
+    },
     "images": [{ "name": "input.png", "image": "data:image/png;base64,..." }],
     "comfy_org_api_key": "optional"
   }
@@ -59,24 +61,24 @@ Set `SERVE_API_LOCALLY=true` to expose the RunPod handler REST API on `0.0.0.0` 
 
 ### Key Environment Variables
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `COMFY_LOG_LEVEL` | `DEBUG` | ComfyUI log verbosity |
-| `REFRESH_WORKER` | `false` | Restart worker container after each job |
-| `SERVE_API_LOCALLY` | — | Expose RunPod handler API on 0.0.0.0 |
-| `BUCKET_ENDPOINT_URL` | — | S3 endpoint; if set, outputs upload to S3 instead of base64 |
-| `COMFY_ORG_API_KEY` | — | Comfy.org API key (can also be passed per-request) |
-| `NETWORK_VOLUME_DEBUG` | `false` | Print diagnostics about `/runpod-volume` model paths |
-| `WEBSOCKET_RECONNECT_ATTEMPTS` | `5` | Reconnect attempts if WS drops mid-job |
-| `WEBSOCKET_TRACE` | `false` | Low-level websocket frame logging |
+| Variable                       | Default | Purpose                                                     |
+| ------------------------------ | ------- | ----------------------------------------------------------- |
+| `COMFY_LOG_LEVEL`              | `DEBUG` | ComfyUI log verbosity                                       |
+| `REFRESH_WORKER`               | `false` | Restart worker container after each job                     |
+| `SERVE_API_LOCALLY`            | —       | Expose RunPod handler API on 0.0.0.0                        |
+| `BUCKET_ENDPOINT_URL`          | —       | S3 endpoint; if set, outputs upload to S3 instead of base64 |
+| `COMFY_ORG_API_KEY`            | —       | Comfy.org API key (can also be passed per-request)          |
+| `NETWORK_VOLUME_DEBUG`         | `false` | Print diagnostics about `/runpod-volume` model paths        |
+| `WEBSOCKET_RECONNECT_ATTEMPTS` | `5`     | Reconnect attempts if WS drops mid-job                      |
+| `WEBSOCKET_TRACE`              | `false` | Low-level websocket frame logging                           |
 
 ### Supported Models (baked into image)
 
-| Workflow | File | Location |
-|---|---|---|
-| Flux Dev | `flux1-dev-fp8.safetensors` | `models/checkpoints/` |
+| Workflow        | File                                     | Location                   |
+| --------------- | ---------------------------------------- | -------------------------- |
+| Flux Dev        | `flux1-dev-fp8.safetensors`              | `models/checkpoints/`      |
 | Qwen-Image 2512 | `qwen_image_2512_fp8_e4m3fn.safetensors` | `models/diffusion_models/` |
-| Qwen-Image 2511 | `qwen_image_edit_2511_bf16.safetensors` | `models/diffusion_models/` |
+| Qwen-Image 2511 | `qwen_image_edit_2511_bf16.safetensors`  | `models/diffusion_models/` |
 
 Qwen workflows use shared VAE (`qwen_image_vae.safetensors`), text encoder (`qwen_2.5_vl_7b_fp8_scaled.safetensors`), Lightning LoRAs, and four custom LoRAs from `comfy-kappa-files-001.s3.us-east-1.amazonaws.com`.
 
