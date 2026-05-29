@@ -4,11 +4,11 @@ Custom ComfyUI Docker worker for RunPod serverless, based on [worker-comfyui](ht
 
 ## Supported Workflows
 
-| Workflow | Type | Model |
-|---|---|---|
-| Flux Dev | Text-to-image | `flux1-dev-fp8.safetensors` |
+| Workflow        | Type          | Model                                    |
+| --------------- | ------------- | ---------------------------------------- |
+| Flux Dev        | Text-to-image | `flux1-dev-fp8.safetensors`              |
 | Qwen-Image 2512 | Text-to-image | `qwen_image_2512_fp8_e4m3fn.safetensors` |
-| Qwen-Image 2511 | Image edit | `qwen_image_edit_2511_bf16.safetensors` |
+| Qwen-Image 2511 | Image edit    | `qwen_image_edit_2511_bf16.safetensors`  |
 
 Qwen workflows run in turbo mode (Lightning LoRA, 6 steps).
 
@@ -88,6 +88,7 @@ gcloud builds submit \
 ```
 
 The build uses a 500 GB disk and pushes to Artifact Registry as:
+
 - `us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base:latest`
 - `us-central1-docker.pkg.dev/project-b882ddad-b8b1-4a5c-908/runpod/model-base:YYYYMMDD-HHMM`
 
